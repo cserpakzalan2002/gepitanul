@@ -1,16 +1,3 @@
-import streamlit as st
-import joblib 
-import pandas as pd
-import warnings
-warnings.filterwarnings('ignore')
-
-from sklearn.linear_model import LogisticRegression
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import train_test_split
-from page import streamlitShow
-
-
-
 
 import streamlit as st
 import joblib
