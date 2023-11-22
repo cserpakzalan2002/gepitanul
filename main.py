@@ -18,7 +18,7 @@ import numpy as np
 
 def predict_item_brand(name, generation, color, number_of_sim):
     # Betöltjük a Decision Tree modelled
-    decision_tree_model = joblib.load('decision_tree_model.joblib')  # Ezt cseréld le a valós fájlnevre
+    decision_tree_model = joblib.load('Decison_Tree_model.joblib')  # Ezt cseréld le a valós fájlnevre
 
     # Ellenőrizzük az input adatokat és átalakítjuk numpy tömbbé
     input_data = np.array([name, generation, color, number_of_sim]).reshape(1, -1)
