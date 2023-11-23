@@ -1,38 +1,48 @@
-
 import streamlit as st
-import joblib
-import numpy as np
+import pandas as pd
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.preprocessing import LabelEncoder
 
-def predict_item_brand(name, generation, color, number_of_sim):
-    # Betöltjük a Decision Tree modelled
-    decision_tree_model = joblib.load('Decison_Tree_model.joblib')  # Ezt cseréld le a valós fájlnevre
+def predict_subscription_status():
+    st.title("Predict Subscription Status")
 
-    # Ellenőrizzük az input adatokat és átalakítjuk numpy tömbbé
-    input_data = np.array([name, generation, color, number_of_sim]).reshape(1, -1)
+    st.write("Please provide the following information for prediction:")
 
-    # Predikció a Decision Tree modelled alapján
-    prediction = decision_tree_model.predict(input_data)
+    age = st.number_input("Age", min_value=18, value=30)
+    gender = st.radio("Gender", ('Male', 'Female'))
+    location = st.text_input("Location")
+    payment_method = st.text_input("Payment Method")
+    frequency = st.number_input("Frequency of Purchases", min_value=0, value=5)
+    discount = st.number_input("Discount Applied", min_value=0, value=0)
 
-    return prediction[0]  # Visszaadjuk a predikciót
+    ok = st.button("Predict Subscription Status")
 
-def main():
-    st.title('Elem Márka Predikció')
+    df = pd.read_csv('shopping_trends_updated.csv')
 
-    name = st.text_input("Termék neve")
-    generation = st.text_input("Termék generációja")
-    color = st.text_input("Termék színe")
-    number_of_sim = st.number_input("SIM kártyák száma", min_value=0, step=1)
+    label_encoders = {}
 
-    if st.button("Predikció"):
-        result = predict_item_brand(name, generation, color, number_of_sim)
-        st.write(f"Az elem márka predikciója: {result}")
+    for col in df.select_dtypes(include=['object']).columns:
+        label_encoders[col] = LabelEncoder()
+        df[col] = label_encoders[col].fit_transform(df[col])
 
-if __name__ == "__main__":
-    main()
+    X = df[['Age', 'Gender', 'Location', 'Payment Method', 'Frequency of Purchases', 'Discount Applied']]
+    y = df['Subscription Status']
 
+    model = RandomForestClassifier(n_estimators=100, random_state=0)
 
+    if ok:
+        model.fit(X, y)
+        new_data = pd.DataFrame({
+            'Age': [age],
+            'Gender': label_encoders['Gender'].transform([gender])[0],
+            'Location': label_encoders['Location'].transform([location])[0],
+            'Payment Method': label_encoders['Payment Method'].transform([payment_method])[0],
+            'Frequency of Purchases': [frequency],
+            'Discount Applied': [discount]
+        })
 
+        predicted_status = model.predict(new_data)
+        status = "Subscribed" if predicted_status[0] == 1 else "Not Subscribed"
+        st.subheader(f"Estimated Subscription Status: {status}")
 
-
-
-
+predict_subscription_status()
