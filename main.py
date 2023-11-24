@@ -18,7 +18,7 @@ def predict_subscription_status():
 
     ok = st.button("Predict Subscription Status")
 
-    df = pd.read_csv('shopping_trends_updated.csv')
+    df = pd.read_csv('shopping_trends.csv')
 
     label_encoders = {}
 
